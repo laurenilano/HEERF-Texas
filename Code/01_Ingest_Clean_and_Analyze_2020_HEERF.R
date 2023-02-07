@@ -144,7 +144,8 @@ Texas_HEERF <- HEERF %>%
   mutate(across(starts_with("studentPortionDisbursed"), ~replace(., is.na(.), 0))) %>%
   mutate(studentPortionDisbursedTotal1 = studentPortionDisbursedTotal,
          studentPortionDisbursedTotal_A1 = studentPortionDisbursedTotal + additionalGrantsA1Funds,
-         totalAdditionalStudentGrants = additionalGrantsA1Funds + additionalGrantsA2Funds + additionalGrantsA3Funds)
+         totalAdditionalStudentGrants = additionalGrantsA1Funds + additionalGrantsA2Funds + additionalGrantsA3Funds) %>%
+  mutate(studentPortionDisbursedTotal = totalAdditionalStudentGrants + studentPortionDisbursedTotal)
 
 # check additional funds
 # texas_funds <- Texas_HEERF %>% select(iheName, studentPortionDisbursedTotal, studentPortionDisbursedTotal1, studentPortionDisbursedTotal_A1,
