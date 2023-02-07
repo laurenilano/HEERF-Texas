@@ -2,6 +2,7 @@
 setwd("~/Dropbox/EdTrust/HEERF")
 
 library(tidyverse)
+
 # ingest raw scorecard data
 scorecard <- read_csv("Raw Data/Scorecard-Latest-Institution.csv")
 
