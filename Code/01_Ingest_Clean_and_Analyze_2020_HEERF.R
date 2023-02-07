@@ -74,8 +74,8 @@ library(readxl)
 # Step 3: Ingest 2020 HEERF Raw Data
 # ------------------------------------------------------------------------------
 
-HEERF <- read_excel("Raw Data/HEERF_Collection_Data_Public-2020-20211119.xlsx")
-Institutional_Information <- read_excel("Raw Data/HEERF_Collection_Data_Public-20201119.xlsx", sheet = "Additional IHE Information")
+HEERF <- read_excel("Raw Data/2020 ESF Data Files/HEERF_Collection_Data_Public-2020-20211119.xlsx")
+Institutional_Information <- read_excel("Raw Data/2020 ESF Data Files/HEERF_Collection_Data_Public-2020-20211119.xlsx", sheet = "Additional IHE Information")
 MSI <- read_csv("Raw Data/MSI.csv", 
                 col_types = cols(HBCU = col_double(), 
                                  PBI = col_double(), 
@@ -138,7 +138,17 @@ Texas_HEERF <- HEERF %>%
   mutate(MSI_Flag = ifelse(MSI_Count > 0, 1, 0)) %>%
   # exclude institutions with data issues
   mutate(distributed_to_more_than_enrolled = ifelse(numIheStudents * 1.10 < studentsRecipientsTotal, 1, 0)) %>%
-  filter(distributed_to_more_than_enrolled == 0 | is.na(distributed_to_more_than_enrolled))
+  filter(distributed_to_more_than_enrolled == 0 | is.na(distributed_to_more_than_enrolled)) %>%
+  # recalculate student distribution to include additional institutional funds disbursed to students
+  mutate(across(starts_with("additionalGrantsA"), ~replace(., is.na(.), 0))) %>%
+  mutate(across(starts_with("studentPortionDisbursed"), ~replace(., is.na(.), 0))) %>%
+  mutate(studentPortionDisbursedTotal1 = studentPortionDisbursedTotal,
+         studentPortionDisbursedTotal_A1 = studentPortionDisbursedTotal + additionalGrantsA1Funds,
+         totalAdditionalStudentGrants = additionalGrantsA1Funds + additionalGrantsA2Funds + additionalGrantsA3Funds)
+
+# check additional funds
+# texas_funds <- Texas_HEERF %>% select(iheName, studentPortionDisbursedTotal, studentPortionDisbursedTotal1, studentPortionDisbursedTotal_A1,
+#                      totalAdditionalStudentGrants, additionalGrantsA1Funds, additionalGrantsA2Funds, additionalGrantsA3Funds)
 
 # ------------------------------------------------------------------------------
 # Step 5. Analysis 
