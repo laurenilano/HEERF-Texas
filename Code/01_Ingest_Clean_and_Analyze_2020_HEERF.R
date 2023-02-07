@@ -126,7 +126,10 @@ Texas_HEERF <- HEERF %>%
          studentsRecipientsUGRDPTNonPellRecipient, #  (UG Part Time NON Pell)
          studentsRecipientsGRDFTStudents, #(Grad Full Time)
          studentsRecipientsGRDPTStudents, #(Grad Part Time)
-         studentPortionDisbursedTotal) %>%
+         studentPortionDisbursedTotal,
+         additionalGrantsA1Funds, # additional institutional funds spent on emergency student grants
+         additionalGrantsA2Funds, # additional institutional funds spent on emergency student grants
+         additionalGrantsA3Funds) %>% # additional institutional funds spent on emergency student grants
   filter(stateCode == "TX") %>%
   left_join(Institutional_Information, by = c("dunsNumber")) %>%
   mutate(UNITID = as.numeric(unitid)) %>%
