@@ -1,0 +1,13 @@
+Research Questions from Proposal
+
+**1. What trends and bright spots can be identified from this institution-level analysis?
+
+**2. Based on the percentages receiving aid, to what extent did the available subcategories of students have equitable access to emergency aid? For example, was the percentage of Pell students receiving emergency aid proportionate to their enrollment?
+
+3. Based on the percentage of allocated funds that reached students, to what extent did the institution have the necessary guidance and capacity to effectively and efficiently distribute emergency aid?
+
+**4. Based on the average aid amount received, to what extent did institutions that serve historically underrepresented students, such as minority-serving institutions or community colleges, receive proportional funding compared to schools with similar numbers of Pell-eligible students?
+
+5. Based on available student-level reporting, to what extent did receipt of emergency aid translate to improved student persistence and completion? What trends or lessons can be learned about the adequacy and efficacy of emergency aid as a student support/affordability strategy moving forward?
+
+Using the quantitative analysis as a guide, we will then undertake a qualitative research process to dig deeper into understanding the conditions that have enabled or prevented the efficient and equitable distribution of emergency aid at the institution level. Our plan is to generate learning and insights based on analysis of data generated from existing federal reporting requirements. The plan is not to request additional quantitative data (although it will certainly be explored if offered by institutions) but to use the existing data to identify trends and inform qualitative inquiry. We will group institutions into key categories with a focus on those serving underrepresented student populations (HBCUs, HSIs, MSIs, and community colleges of different size classifications) and then conduct focus groups with approximately a dozen stakeholders, including students, financial aid officers, and other relevant practitioners and leaders at five to seven institutions. By creating an intentional sample of institutions and collaborating with partners on the ground to build buy-in, a wide range of categories can be represented. Focus group protocols will be designed to surface best practices, barriers, and lessons learned that could then be disseminated and inform policy recommendations at the institution, state, and federal levels.
