@@ -133,7 +133,7 @@ Texas_HEERF <- HEERF %>%
   filter(stateCode == "TX") %>%
   left_join(Institutional_Information, by = c("dunsNumber")) %>%
   mutate(UNITID = as.numeric(unitid)) %>%
-  left_join(MSI, by = c("UNITID")) %>%
+  left_join(MSI, by = c("UNITID")) %>% # Had to update some Unitids from raw data file to match
   mutate(MSI_Count = HBCU + PBI + ANNHI + TRIBAL + AANAPII + HSI + NANTI) %>%
   mutate(MSI_Flag = ifelse(MSI_Count > 0, 1, 0)) %>%
   # exclude institutions with data issues

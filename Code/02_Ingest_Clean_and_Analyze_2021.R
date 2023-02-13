@@ -27,3 +27,11 @@ MSI <- read_csv("Raw Data/MSI.csv",
                                  AANAPII = col_double(), 
                                  HSI = col_double(), 
                                  NANTI = col_double())) 
+
+Texas_2021_HEERF <- HEERF_2021 %>%
+  filter(state == "TEXAS") %>%
+  left_join(Institutional_Information_2021, by = c("dunsNumber"="duns"))
+
+# I(nstitutions with no duns)
+x <- Texas_2021_HEERF %>%
+  filter(is.na(instnm))
