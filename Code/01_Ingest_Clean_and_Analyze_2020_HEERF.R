@@ -253,7 +253,7 @@ Inst_Level <- Texas_HEERF %>%
          receivedUG = studentsRecipientsTotal - (studentsRecipientsGRDFTStudents + studentsRecipientsGRDPTStudents)) %>%
   mutate(pct_received_who_are_pell = receivedPellUG / receivedUG * 100,
          avgStudentAward = studentPortionDisbursedTotal / studentsRecipientsTotal) %>%
-  select(unitid, iheName, MSI_Flag, studentsRecipientsTotal, eligibleStudentsTotal, studentPortionDisbursedTotal, avgStudentAward, pct_eligible_who_received_aid_by_inst,
+  select(unitid, iheName, MSI_Flag, HBCU, PBI, ANNHI, TRIBAL, AANAPII, HSI, NANTI, studentsRecipientsTotal, eligibleStudentsTotal, studentPortionDisbursedTotal, avgStudentAward, pct_eligible_who_received_aid_by_inst,
          pct_enrolled_who_received_aid_by_inst, pct_enrolled_who_were_eligible, pctPell, pct_received_who_are_pell,
          eligiblePellUG, eligibleNonPellUG, eligibleUG, receivedPellUG, receivedNonPellUG, receivedUG)
 
