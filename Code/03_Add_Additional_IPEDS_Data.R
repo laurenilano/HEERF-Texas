@@ -44,7 +44,7 @@ EF_Retention <- EF_Retention %>%
 Inst_Characteristics <- HD2020 %>%
   select(UNITID, INSTNM, ADDR, CITY, STABBR, ZIP, FIPS, OPEID, 
          SECTOR, ICLEVEL, CONTROL, INSTCAT, 
-         LANDGRNT, INSTSIZE, LOCALE, POSTSEC, PSEFLAG, PSET4FLG, LONGITUD, LATITUDE) %>%
+         LANDGRNT, INSTSIZE, LOCALE, POSTSEC, LONGITUD, LATITUDE) %>%
   mutate(SECTOR = case_when(SECTOR == 0 ~ "Administrative Unit",
                             SECTOR == 1 ~ "Public, 4-year or above",
                             SECTOR == 2 ~ "Private not-for-profit, 4-year or above",
@@ -75,7 +75,32 @@ Inst_Characteristics <- HD2020 %>%
                              INSTCAT == 6 ~ "Nondegree-granting, sub-baccalaureate",
                              INSTCAT == -1 ~ "Not reported",
                              INSTCAT == -2 ~ "Not applicable",
-                             TRUE ~ NA_character_))
+                             TRUE ~ NA_character_),
+         LANDGRNT = case_when(LANDGRNT == 1 ~ "Land Grant Institution",
+                              LANDGRNT == 2 ~ "Not a Land Grant Institution",
+                              TRUE ~ NA_character_),
+         INSTSIZE = case_when(INSTSIZE == 1 ~ "Under 1,000",
+                              INSTSIZE == 2 ~ "1,000 - 4,999",
+                              INSTSIZE == 3 ~ "5,000 - 9,999",
+                              INSTSIZE == 4 ~ "10,000 - 19,999",
+                              INSTSIZE == 5 ~ "20,000 and above",
+                              INSTSIZE == -1 ~ "Not reported",
+                              INSTSIZE == -2 ~ "Not applicable",
+                              TRUE ~ NA_character_),
+         LOCALE = case_when(LOCALE == 11 ~ "City: Large",
+                            LOCALE == 12 ~ "City: Midsize",
+                            LOCALE == 13 ~ "City: Small",
+                            LOCALE == 21 ~ "Suburb: Large",
+                            LOCALE == 22 ~ "Suburb: Midsize",
+                            LOCALE == 23 ~ "Suburb: Small",
+                            LOCALE == 31 ~ "Town: Fringe",
+                            LOCALE == 32 ~ "Town: Distant",
+                            LOCALE == 33 ~ "Town: Remote",
+                            LOCALE == 41 ~ "Rural: Fringe",
+                            LOCALE == 42 ~ "Rural: Distant",
+                            LOCALE == 43 ~ "Rural: Remote",
+                            LOCALE == -3 ~ "Not available",
+                            TRUE ~ NA_character_))
 
 # Ingest Current Texas Dataframe
 Texas_HEERF_2020 <- read_csv("Out/Texas_HEI_HEERF.csv") %>%
