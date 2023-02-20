@@ -184,12 +184,18 @@ Texas_2021_HEERF <- HEERF_2021 %>%
   # exclude institutions with data issues -- none, use allEnrolledStudents, not ipeds numIheStudents (not 12 month)
   mutate(distributed_to_more_than_enrolled = ifelse(allEnrolledStudents * 1.10 < allStudentsHeerRecipients, 1, 0))
 
-# Rename Variables
-
+# Additional Cleaning Steps:
 # Force NA to 0
+# Calculate student portion distributed total - including emergency grants
+# Add additional IPEDS characteristics: localeType, etc
 
+# Analysis ---------------------------------------------------------------------
 
+## HEERF Spending by Institution Type (Sector, Control, locale)
 
+## Spending by MSI Type
+
+## Institution Level
 
 
 
