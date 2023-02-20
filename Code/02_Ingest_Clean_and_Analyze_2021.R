@@ -180,7 +180,9 @@ Texas_2021_HEERF <- HEERF_2021 %>%
   left_join(Institutional_Information_2021, by = c("dunsNumber"="duns")) %>%
   left_join(MSI, by = c("unitid" = "UNITID")) %>% # unitid is from Inst Information 2021
   # remove 3 institutions with no match on duns (261 -> 258)
-  filter(!is.na(instnm))
+  filter(!is.na(instnm)) %>%
+  # exclude institutions with data issues -- none, use allEnrolledStudents, not ipeds numIheStudents (not 12 month)
+  mutate(distributed_to_more_than_enrolled = ifelse(allEnrolledStudents * 1.10 < allStudentsHeerRecipients, 1, 0))
 
 # Rename Variables
 
