@@ -1,6 +1,8 @@
 # Add IPEDS variables (Retention Rates and Institutional Characteristics) to Analytic Dataset
 # Last Updated: 1/31/2023
 
+library(tidyverse)
+
 # ------------------------------------------------------------------------------
 #  Ingest Data
 # ------------------------------------------------------------------------------

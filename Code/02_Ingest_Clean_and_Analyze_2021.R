@@ -3,15 +3,7 @@ library(tidyverse)
 library(readxl)
 
 # ------------------------------------------------------------------------------
-# Step 1: Download data and DED from https://covid-relief-data.ed.gov/
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Step 2: Review DED to familiarize yourself with the type of data available
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Step 3: Ingest 2020 HEERF Raw Data
+# Ingest Data: 2021 HEERF, 2021 Additional Inst Info, MSI Flags from Scorecard
 # ------------------------------------------------------------------------------
 
 HEERF_2021 <- read_excel("Raw Data/2021 ESF Data Files/heer-2021-public-2023-02.xlsx",
@@ -186,12 +178,17 @@ Texas_2021_HEERF <- HEERF_2021 %>%
          enroll2019GW) %>%
   filter(state == "TEXAS") %>%
   left_join(Institutional_Information_2021, by = c("dunsNumber"="duns")) %>%
-  left_join(MSI, by = c("unitid" = "UNITID"))
+  left_join(MSI, by = c("unitid" = "UNITID")) %>% # unitid is from Inst Information 2021
+  # remove 3 institutions with no match on duns (261 -> 258)
+  filter(!is.na(instnm))
 
-# Institutions with no match on duns
-x <- Texas_2021_HEERF %>%
-  filter(is.na(instnm))
+# Rename Variables
 
-# Institutions with no match on Unitid (MSI missing)
-x <- Texas_2021_HEERF %>%
-  filter(is.na(HBCU)) # PMHS
+# Force NA to 0
+
+
+
+
+
+
+
