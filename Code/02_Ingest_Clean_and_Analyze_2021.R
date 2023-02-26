@@ -288,9 +288,70 @@ get_pell_averages <- function(demo){
   
 }
 
+
+get_race_eth_averages <- function(demo){
+  Texas_2021_HEERF %>%
+  #filter(!unitid %in% c(AI_issues)) %>% See note above
+  mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
+         across(ends_with("ReceivedAidGrant"), ~replace(., is.na(.), 0))) %>%
+  group_by({{demo}}) %>%
+  summarise(n = n(),
+            Average_AI_Distribution = sum(aiTotalAmountOfGrants, na.rm = T) / sum(aiReceivedAidGrant, na.rm = T),
+            Average_Asian_Distribution = sum(aTotalAmountOfGrants, na.rm = T) / sum(aReceivedAidGrant, na.rm = T),
+            Average_Black_Distribution = sum(bTotalAmountOfGrants, na.rm = T) / sum(bReceivedAidGrant, na.rm = T),
+            Average_Latinx_Distribution = sum(hTotalAmountOfGrants, na.rm = T) / sum(hReceivedAidGrant, na.rm = T),
+            Average_NH_Distribution = sum(nhTotalAmountOfGrants, na.rm = T) / sum(nhReceivedAidGrant, na.rm = T),
+            Average_White_Distribution = sum(wTotalAmountOfGrants, na.rm = T) / sum(wReceivedAidGrant, na.rm = T),
+            Average_TMR_Distribution = sum(tmrTotalAmountOfGrants, na.rm = T) / sum(tmrReceivedAidGrant, na.rm = T))
+}
+
 # ==============================================================================
 # Analysis 
 # ==============================================================================
+
+# Overall Spending for IHE in Sample
+Texas_2021_HEERF %>%
+  group_by(state) %>%
+  summarise(n = n(),
+            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T))
+
+
+# Overall Spending by Institution Type
+Texas_2021_HEERF %>%
+  group_by(iheType, iheControl) %>%
+  summarise(n = n(),
+            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T))
+
+# Overall Spending by MSI Type
+
+Texas_2021_HEERF %>%
+  group_by(AANAPII) %>%
+  summarise(n = n(),
+            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T)) %>%
+  filter(AANAPII == 1)
+
+Texas_2021_HEERF %>%
+  group_by(HBCU) %>%
+  summarise(n = n(),
+            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T)) %>%
+  filter(HBCU == 1)
+
+Texas_2021_HEERF %>%
+  group_by(HSI) %>%
+  summarise(n = n(),
+            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T)) %>%
+  filter(HSI == 1)
+
 
 ## Pell ------------------------------------------------------------------------
 
@@ -343,7 +404,8 @@ Pell_Spending_NANTI <- get_pell_averages(NANTI) %>%
 Pell_Spending_by_MSI_Type <- rbind(
   Pell_Spending_HBCU, Pell_Spending_PBI, Pell_Spending_ANNHI, Pell_Spending_Tribal,
   Pell_Spending_AANAPII, Pell_Spending_HSI, Pell_Spending_NANTI
-)
+) %>%
+  filter(flag == 1)
 
 ## Race ------------------------------------------------------------------------
 # exclude race/ethnicity issues
@@ -357,6 +419,11 @@ Pell_Spending_by_MSI_Type <- rbind(
 # AI_issues <- race_eth_issues %>% filter(AI_Issue == 1) %>% pull(unitid)
 
 
+
+# ALL (TX)
+RaceEth_Spending_State <- get_race_eth_averages(state)
+
+# INSTITUTION TYPE
 RaceEth_Spending_by_Inst_Type <- Texas_2021_HEERF %>%
   #filter(!unitid %in% c(AI_issues)) %>% See note above
   mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
@@ -371,49 +438,22 @@ RaceEth_Spending_by_Inst_Type <- Texas_2021_HEERF %>%
             Average_White_Distribution = sum(wTotalAmountOfGrants, na.rm = T) / sum(wReceivedAidGrant, na.rm = T),
             Average_TMR_Distribution = sum(tmrTotalAmountOfGrants, na.rm = T) / sum(tmrReceivedAidGrant, na.rm = T))
 
+# MSI
+RaceEth_Spending_HBCU <- get_race_eth_averages(HBCU) %>%
+  rename(flag = HBCU) %>%
+  mutate(MSI_Type = "HBCU")
 
+RaceEth_Spending_AANAPII <- get_race_eth_averages(AANAPII) %>%
+  rename(flag = AANAPII) %>%
+  mutate(MSI_Type = "AANAPII") 
 
+RaceEth_Spending_HSI <- get_race_eth_averages(HSI) %>%
+  rename(flag = HSI) %>%
+  mutate(MSI_Type = "HSI")
 
-
-
-
-
-Spending_by_Inst_Type <- Texas_2021_HEERF %>%
-  mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
-         across(ends_with("ReceivedAidGrant"), ~replace(., is.na(.), 0))) %>%
-  group_by(iheType, iheControl) %>%
-  summarise(
-            n = n(),
-            # All
-            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
-            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
-            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T),
-            # Pell
-            Total_Pell_Distribution = sum(ugFtPellGrantAmountTotal, ugPtPellGrantAmountTotal, na.rm = T),
-            Total_Pell_Students = sum(ugFtPellEnrolled, ugPtPellEnrolled, na.rm = T),
-            Pell_Recipients = sum(ugFtPellHeerRecipients, ugPtPellHeerRecipients, na.rm = T),
-            Average_Pell_Distribution = sum(Total_Pell_Distribution, na.rm = T)/sum(Pell_Recipients, na.rm = T),
-            # Race/Ethnicity
-            Average_AI_Distribution = sum(aiTotalAmountOfGrants, na.rm = T) / sum(aiReceivedAidGrant, na.rm = T),
-            Average_Asian_Distribution = sum(aTotalAmountOfGrants, na.rm = T) / sum(aReceivedAidGrant, na.rm = T),
-            Average_Black_Distribution = sum(bTotalAmountOfGrants, na.rm = T) / sum(bReceivedAidGrant, na.rm = T),
-            Average_Latinx_Distribution = sum(hTotalAmountOfGrants, na.rm = T) / sum(hReceivedAidGrant, na.rm = T),
-            Average_NH_Distribution = sum(nhTotalAmountOfGrants, na.rm = T) / sum(nhReceivedAidGrant, na.rm = T),
-            Average_White_Distribution = sum(wTotalAmountOfGrants, na.rm = T) / sum(wReceivedAidGrant, na.rm = T),
-            Average_TMR_Distribution = sum(tmrTotalAmountOfGrants, na.rm = T) / sum(tmrReceivedAidGrant, na.rm = T))
-            )
-
-# Check Pell Distribution for 2-year Private Not-For-Profit -- tried to remove inst. (see issues above) where they distributed monies to pell students but didnt list any pell recipients
-PnfP <- Texas_2021_HEERF %>%
-  filter(iheType == "2 Year", iheControl == "Private Not-For-Profit") %>%
-  select(instnm, aiTotalAmountOfGrants, aiReceivedAidGrant, aTotalAmountOfGrants, aReceivedAidGrant, allStudentsGrantAmountTotal, allStudentsHeerRecipients, ugFtPellEnrolled, ugPtPellEnrolled, ugFtPellHeerRecipients,
-         ugPtPellHeerRecipients, ugFtPellGrantAmountTotal, ugPtPellGrantAmountTotal, ugFtPellAverageHeerAmount)
-
-# ==============================================================================
-# Spending by MSI Type
-# ==============================================================================
-
-
+RaceEth_Spending_by_MSI_Type <- rbind(
+  RaceEth_Spending_AANAPII, RaceEth_Spending_HSI, RaceEth_Spending_HBCU
+) %>% filter(flag == 1)
 
 
 
@@ -431,6 +471,47 @@ Withdraw_Rate <- Texas_2021_HEERF %>%
          UG_Withdraw_Rate_2021 = (enroll2021UgW/enroll2021Ug) * 100) %>%
   select(instnm, contains("Withdraw_Rate"))
 
+# Since only roughly 50 percent of institutions have this information, it may be better to use IPEDS data. 
+# The data is likely biased since only 20% of institutions filled in this information. 
+# Maybe only institutions who knew they did well shared this info. Or maybe only more resourced institutions. 
+# Either way, its biased so prefer not to use. 
+
+
+
+### SCRATCH
+
+
+
+Spending_by_Inst_Type <- Texas_2021_HEERF %>%
+  mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
+         across(ends_with("ReceivedAidGrant"), ~replace(., is.na(.), 0))) %>%
+  group_by(iheType, iheControl) %>%
+  summarise(
+    n = n(),
+    # All
+    Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+    Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+    Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T),
+    # Pell
+    Total_Pell_Distribution = sum(ugFtPellGrantAmountTotal, ugPtPellGrantAmountTotal, na.rm = T),
+    Total_Pell_Students = sum(ugFtPellEnrolled, ugPtPellEnrolled, na.rm = T),
+    Pell_Recipients = sum(ugFtPellHeerRecipients, ugPtPellHeerRecipients, na.rm = T),
+    Average_Pell_Distribution = sum(Total_Pell_Distribution, na.rm = T)/sum(Pell_Recipients, na.rm = T),
+    # Race/Ethnicity
+    Average_AI_Distribution = sum(aiTotalAmountOfGrants, na.rm = T) / sum(aiReceivedAidGrant, na.rm = T),
+    Average_Asian_Distribution = sum(aTotalAmountOfGrants, na.rm = T) / sum(aReceivedAidGrant, na.rm = T),
+    Average_Black_Distribution = sum(bTotalAmountOfGrants, na.rm = T) / sum(bReceivedAidGrant, na.rm = T),
+    Average_Latinx_Distribution = sum(hTotalAmountOfGrants, na.rm = T) / sum(hReceivedAidGrant, na.rm = T),
+    Average_NH_Distribution = sum(nhTotalAmountOfGrants, na.rm = T) / sum(nhReceivedAidGrant, na.rm = T),
+    Average_White_Distribution = sum(wTotalAmountOfGrants, na.rm = T) / sum(wReceivedAidGrant, na.rm = T),
+    Average_TMR_Distribution = sum(tmrTotalAmountOfGrants, na.rm = T) / sum(tmrReceivedAidGrant, na.rm = T))
+)
+
+# Check Pell Distribution for 2-year Private Not-For-Profit -- tried to remove inst. (see issues above) where they distributed monies to pell students but didnt list any pell recipients
+PnfP <- Texas_2021_HEERF %>%
+  filter(iheType == "2 Year", iheControl == "Private Not-For-Profit") %>%
+  select(instnm, aiTotalAmountOfGrants, aiReceivedAidGrant, aTotalAmountOfGrants, aReceivedAidGrant, allStudentsGrantAmountTotal, allStudentsHeerRecipients, ugFtPellEnrolled, ugPtPellEnrolled, ugFtPellHeerRecipients,
+         ugPtPellHeerRecipients, ugFtPellGrantAmountTotal, ugPtPellGrantAmountTotal, ugFtPellAverageHeerAmount)
 
 
 
