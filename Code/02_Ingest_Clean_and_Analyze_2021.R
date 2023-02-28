@@ -196,8 +196,10 @@ Texas_2021_HEERF <- HEERF_2021 %>%
         ends_with("ReceivedAidGrant"), ends_with("TotalAmountOfGrants"), ends_with("AverageHeerfAward"),
         starts_with("enroll2021"), starts_with("enroll2020"), starts_with("enroll2019")) %>%
   # in awardedAmounts, force NA to 0
-  mutate(across(starts_with("awardedAmounts"), ~replace(., is.na(.), 0)))
+  mutate(across(starts_with("awardedAmounts"), ~replace(., is.na(.), 0))) %>%
         # across(ends_with("HeerRecipients"), ~replace(., is.na(.), 0)))
+  mutate(MSI_Count = HBCU + PBI + ANNHI + TRIBAL + AANAPII + HSI + NANTI) %>%
+  mutate(MSI_Flag = ifelse(MSI_Count > 0, 1, 0))
 
 
 
@@ -265,6 +267,9 @@ race_eth_issues <- Texas_2021_HEERF %>%
 # Force NA to 0
 # Calculate student portion distributed total - including emergency grants
 # Add additional IPEDS characteristics: localeType, etc
+
+write_csv(Texas_2021_HEERF, "Out/Texas_2021_HEERF.csv")
+write_csv(pell_issues, "Out/Texas_2021_Pell_Issues.csv")
 
 # ==============================================================================
 # Functions
