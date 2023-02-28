@@ -47,6 +47,7 @@ Texas_2021_HEERF <- HEERF_2021 %>%
          ugFtPellHeerRecipients,
          ugFtNonPellHeerRecipients,
          ugPtPellHeerRecipients,
+         ugPtNonPellHeerRecipients,
          gFtHeerRecipients,
          gPtHeerRecipients,
          allStudentsHeerRecipients,
@@ -278,7 +279,7 @@ write_csv(pell_issues, "Out/Texas_2021_Pell_Issues.csv")
 get_pell_averages <- function(demo){
   
   # Get List of Inst With Pell Issues
-  issues <- issues %>% pull(unitid)
+  issues_list <- pell_issues %>% pull(unitid)
   
   Texas_2021_HEERF %>%
     filter(!unitid %in% c(issues)) %>%
@@ -290,7 +291,22 @@ get_pell_averages <- function(demo){
               Total_Pell_Students = sum(ugFtPellEnrolled, ugPtPellEnrolled, na.rm = T),
               Pell_Recipients = sum(ugFtPellHeerRecipients, ugPtPellHeerRecipients, na.rm = T),
               Average_Pell_Distribution = sum(Total_Pell_Distribution, na.rm = T)/sum(Pell_Recipients, na.rm = T))
+}
+
+get_nonpell_averages <- function(demo){
+  # Get List of Inst With Pell Issues
+  issues_list <- pell_issues %>% pull(unitid)
   
+  Texas_2021_HEERF %>%
+    filter(!unitid %in% c(issues_list)) %>%
+    mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
+           across(ends_with("ReceivedAidGrant"), ~replace(., is.na(.), 0))) %>%
+    group_by({{demo}}) %>%
+    summarise(n = n(),
+              Total_Non_Pell_Distribution = sum(ugFtNonPellGrantAmountTotal, ugPtNonPellGrantAmountTotal, na.rm = T),
+              Total_Non_Pell_Students = sum(ugFtNonPellEnrolled, ugPtNonPellEnrolled, na.rm = T),
+              Non_Pell_Recipients = sum(ugFtNonPellHeerRecipients, ugPtNonPellHeerRecipients, na.rm = T),
+              Average_Non_Pell_Distribution = sum(Total_Non_Pell_Distribution, na.rm = T)/sum(Non_Pell_Recipients, na.rm = T))
 }
 
 
@@ -307,7 +323,8 @@ get_race_eth_averages <- function(demo){
             Average_Latinx_Distribution = sum(hTotalAmountOfGrants, na.rm = T) / sum(hReceivedAidGrant, na.rm = T),
             Average_NH_Distribution = sum(nhTotalAmountOfGrants, na.rm = T) / sum(nhReceivedAidGrant, na.rm = T),
             Average_White_Distribution = sum(wTotalAmountOfGrants, na.rm = T) / sum(wReceivedAidGrant, na.rm = T),
-            Average_TMR_Distribution = sum(tmrTotalAmountOfGrants, na.rm = T) / sum(tmrReceivedAidGrant, na.rm = T))
+            Average_TMR_Distribution = sum(tmrTotalAmountOfGrants, na.rm = T) / sum(tmrReceivedAidGrant, na.rm = T),
+            Average_NR_Distribution = sum(nrTotalAmountOfGrants, na.rm = T) / sum(nrReceivedAidGrant), na.rm = T)
 }
 
 # ==============================================================================
@@ -357,13 +374,31 @@ Texas_2021_HEERF %>%
             Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T)) %>%
   filter(HSI == 1)
 
+Texas_2021_HEERF %>%
+  group_by(MSI_Flag) %>%
+  summarise(n = n(),
+            Total_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T),
+            Total_Student_Recipients = sum(allStudentsHeerRecipients, na.rm = T), 
+            Average_Student_Distribution = sum(allStudentsGrantAmountTotal, na.rm = T)/sum(allStudentsHeerRecipients, na.rm = T)) 
 
 ## Pell ------------------------------------------------------------------------
 
 # ALL (TX) 
 Pell_Spending_State <- get_pell_averages(state)
+NonPell_Spending_State <- get_nonpell_averages(state)
 
 # INSTITUTION TYPE 
+Non_Pell_Spending_by_Inst_Type <- Texas_2021_HEERF %>%
+  filter(!unitid %in% c(issues)) %>%
+  mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
+         across(ends_with("ReceivedAidGrant"), ~replace(., is.na(.), 0))) %>%
+  group_by(iheType, iheControl) %>%
+  summarise(n = n(),
+            Total_Non_Pell_Distribution = sum(ugFtNonPellGrantAmountTotal, ugPtNonPellGrantAmountTotal, na.rm = T),
+            Total_Non_Pell_Students = sum(ugFtNonPellEnrolled, ugPtNonPellEnrolled, na.rm = T),
+            Non_Pell_Recipients = sum(ugFtNonPellHeerRecipients, ugPtNonPellHeerRecipients, na.rm = T),
+            Average_Non_Pell_Distribution = sum(Total_Non_Pell_Distribution, na.rm = T)/sum(Non_Pell_Recipients, na.rm = T))
+
 Pell_Spending_by_Inst_Type <- Texas_2021_HEERF %>%
   filter(!unitid %in% c(issues)) %>%
   mutate(across(ends_with("TotalAmountOfGrants"), ~replace(., is.na(.), 0)),
@@ -406,11 +441,54 @@ Pell_Spending_NANTI <- get_pell_averages(NANTI) %>%
   mutate(MSI_Type = "NANTI") %>%
   rename(flag = NANTI)
 
+Pell_Spending_NotanMSI <- get_pell_averages(MSI_Flag) %>%
+  filter(MSI_Flag == 0)
+
 Pell_Spending_by_MSI_Type <- rbind(
   Pell_Spending_HBCU, Pell_Spending_PBI, Pell_Spending_ANNHI, Pell_Spending_Tribal,
   Pell_Spending_AANAPII, Pell_Spending_HSI, Pell_Spending_NANTI
 ) %>%
   filter(flag == 1)
+
+
+# Get Non Pell Spending by MSI
+NonPell_Spending_HBCU <- get_nonpell_averages(HBCU) %>%
+  mutate(MSI_Type = "HBCU") %>%
+  rename(flag = HBCU)
+
+NonPell_Spending_PBI <- get_nonpell_averages(PBI) %>%
+  mutate(MSI_Type = "PBI") %>%
+  rename(flag = PBI)
+
+NonPell_Spending_ANNHI <- get_nonpell_averages(ANNHI) %>%
+  mutate(MSI_Type = "ANNHI") %>%
+  rename(flag = ANNHI)
+
+NonPell_Spending_Tribal <- get_nonpell_averages(TRIBAL) %>%
+  mutate(MSI_Type = "TRIBAL") %>%
+  rename(flag = TRIBAL)
+
+NonPell_Spending_AANAPII <- get_nonpell_averages(AANAPII) %>%
+  mutate(MSI_Type = "AANAPII") %>%
+  rename(flag = AANAPII)
+
+NonPell_Spending_HSI <- get_nonpell_averages(HSI) %>%
+  mutate(MSI_Type = "HSI") %>%
+  rename(flag = HSI)
+
+NonPell_Spending_NANTI <- get_nonpell_averages(NANTI) %>%
+  mutate(MSI_Type = "NANTI") %>%
+  rename(flag = NANTI)
+
+NonPell_Spending_by_MSI_Type <- rbind(
+  NonPell_Spending_HBCU, NonPell_Spending_PBI, NonPell_Spending_ANNHI, NonPell_Spending_Tribal,
+  NonPell_Spending_AANAPII, NonPell_Spending_HSI, NonPell_Spending_NANTI
+) %>%
+  filter(flag == 1)
+
+get_nonpell_averages(MSI_Flag)
+
+
 
 ## Race ------------------------------------------------------------------------
 # exclude race/ethnicity issues
